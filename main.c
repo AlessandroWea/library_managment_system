@@ -33,6 +33,7 @@ Functionality:
     - exclude a reader
     - show all the readers
     - select a reader to show his information
+
 */
 enum {
     FALSE, TRUE
@@ -241,6 +242,7 @@ void get_library(Library *library)
     get_books(library);
     get_readers(library);
 }
+//SELECT * FROM TableName;
 
 void get_books(Library *library)
 {
@@ -297,7 +299,34 @@ void get_books(Library *library)
 
 void get_readers(Library *library)
 {
+    sqlite3 *db;
+    char *err_msg;
+    sqlite3_stmt *stmt;
+    char sql[50] = "SELECT * FROM ";
+    strcpy(sql,READERS_TABLE_NAME);
 
+    int rc = sqlite3_open(DB_NAME,&db);
+
+    if( rc != SQLITE_OK)
+    {
+        fprintf(stderr,"DEBUG: Cannot open database: %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+        return;
+    }
+
+    rc = sqlite3_prepare_v2(db,sql,-1,&stmt,0);
+
+    if( rc != SQLITE_OK)
+    {
+        fprintf(stderr,"DEBUG: failed to execute statement: %s\n",sqlite3_errmgs(db));
+        return;
+    }
+
+    int step = sqlite3_step(stmt);
+    char tmp_first_name[MAX_READER_FIRST_NAME_SIZE];
+    char tmp_last_name[MAX_READER_LAST_NAME_SIZE];
+    char tmp_books[MAX_READER_BOOKS_TAKEN_SIZE];
+    
 }
 
 void books_managment()
