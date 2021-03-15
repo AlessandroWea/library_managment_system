@@ -1,3 +1,4 @@
+#include <stdio.h>
 
 void show_main_menu()
 {

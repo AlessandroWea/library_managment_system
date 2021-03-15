@@ -1,4 +1,7 @@
 #include "db_interactions.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 void make_tables()
 {
@@ -17,7 +20,9 @@ void make_tables()
                 "ID INTEGER PRIMARY KEY AUTOINCREMENT,"\
                 "FIRST_NAME TEXT NOT NULL,"\
                 "LAST_NAME TEXT NOT NULL,"\
-                "BOOKS TEXT);";
+                "AGE INTEGER NOT NULL,"\
+                "BOOKS_TAKEN TEXT,"\
+                "COUNT_BOOKS_TAKEN INTEGER NOT NULL);";
 
     if( (rc = sqlite3_open(DB_NAME,&db) ) )
     {
@@ -50,8 +55,8 @@ void add_some_data_to_tables(sqlite3 *db)
 {
     char *sql = "INSERT INTO books (NAME,AUTHOR) VALUES ('first','Sasha Ge');"\
                 "INSERT INTO books (NAME,AUTHOR) VALUES ('second','Sasha Ge');"\
-                "INSERT INTO readers (FIRST_NAME, LAST_NAME, BOOKS) VALUES ('Sa','Ka','1');"\
-            "INSERT INTO readers (FIRST_NAME, LAST_NAME, BOOKS) VALUES ('Se','Kan','1,2');";
+                "INSERT INTO readers (FIRST_NAME, LAST_NAME, AGE, BOOKS_TAKEN, COUNT_BOOKS_TAKEN) VALUES ('Sa','Ka',22,'1',1);"\
+            "INSERT INTO readers (FIRST_NAME, LAST_NAME, BOOKS) VALUES ('Se','Kan',23,'1,2',2);";
     char *err_msg = 0;
 
     int rc = sqlite3_exec(db,sql,0,0,&err_msg);
@@ -67,13 +72,14 @@ void add_some_data_to_tables(sqlite3 *db)
     }
 }
 
-void get_books(Library *library)
+int get_books(Library *library)
 {
     sqlite3 *db;
     char *err_msg = 0;
     sqlite3_stmt *stmt;
     char sql[50] = "SELECT * FROM ";
     strcpy(sql,BOOKS_TABLE_NAME);
+    strcpy(sql, ";");
 
     int rc = sqlite3_open(DB_NAME,&db);
 
@@ -81,7 +87,7 @@ void get_books(Library *library)
     {
         fprintf(stderr,"DEBUG: Cannot open database: %s\n", sqlite3_errmsg(db));
         sqlite3_close(db);
-        return;
+        return 1;
     }
 
     rc = sqlite3_prepare_v2(db,sql,-1,&stmt,0);
@@ -89,7 +95,7 @@ void get_books(Library *library)
     if( rc != SQLITE_OK)
     {
         fprintf(stderr,"DEBUG: Failed to execute statement: %s\n",sqlite3_errmsg(db));
-        return;
+        return 1;
     }
 
     int step = sqlite3_step(stmt);
@@ -104,7 +110,8 @@ void get_books(Library *library)
 
         strcpy(tmp_name, sqlite3_column_text(stmt,1));
         strcpy(tmp_author, sqlite3_column_text(stmt,2));
-        
+        library->books[library->books_count].id = sqlite3_column_int(stmt,0);
+
         library->books[library->books_count].name = (char*) malloc(sizeof(char)*strlen(tmp_name)+1);
         library->books[library->books_count].author = (char*) malloc(sizeof(char)*strlen(tmp_author)+1);
 
@@ -118,15 +125,18 @@ void get_books(Library *library)
 
     sqlite3_finalize(stmt);
     sqlite3_close(db);
+
+    return 0;
 }
 
-void get_readers(Library *library)
+int get_readers(Library *library)
 {
     sqlite3 *db;
     char *err_msg;
     sqlite3_stmt *stmt;
     char sql[50] = "SELECT * FROM ";
     strcpy(sql,READERS_TABLE_NAME);
+    strcpy(sql, ";");
 
     int rc = sqlite3_open(DB_NAME,&db);
 
@@ -134,20 +144,26 @@ void get_readers(Library *library)
     {
         fprintf(stderr,"DEBUG: Cannot open database: %s\n", sqlite3_errmsg(db));
         sqlite3_close(db);
-        return;
+        return 1;
     }
 
     rc = sqlite3_prepare_v2(db,sql,-1,&stmt,0);
 
     if( rc != SQLITE_OK)
     {
-        fprintf(stderr,"DEBUG: failed to execute statement: %s\n",sqlite3_errmgs(db));
-        return;
+        fprintf(stderr,"DEBUG: failed to execute statement: %s\n",sqlite3_errmsg(db));
+        return 1;
     }
 
     int step = sqlite3_step(stmt);
     char tmp_first_name[MAX_READER_FIRST_NAME_SIZE];
     char tmp_last_name[MAX_READER_LAST_NAME_SIZE];
-    char tmp_books[MAX_READER_BOOKS_TAKEN_SIZE];
-    
+    char tmp_books_taken[MAX_READER_BOOKS_TAKEN_SIZE];
+
+    // while(step == SQLITE_ROW)
+    // {
+
+    // }
+
+    return 0;
 }

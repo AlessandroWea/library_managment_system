@@ -8,7 +8,7 @@
 void make_tables();
 void add_some_data_to_tables(sqlite3 *db);
 
-void get_books(Library *library);
-void get_readers(Library *library);
+int get_books(Library *library);
+int get_readers(Library *library);
 
 #endif

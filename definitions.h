@@ -31,6 +31,7 @@ enum {
 #define MAX_READER_FIRST_NAME_SIZE 50
 #define MAX_READER_LAST_NAME_SIZE 50
 #define MAX_READER_BOOKS_TAKEN_SIZE 10
+#define MAX_READER_BOOKS_TAKEN_COUNT 4
 #define MAX_STR_SIZE 100
 
 #define MAX_LIBRARY_BOOKS_SIZE 100
@@ -40,20 +41,21 @@ enum {
 #define BOOKS_TABLE_NAME "books"
 #define READERS_TABLE_NAME "readers"
 
-
 // structures
 
 typedef struct _Book {
+    int id;
     char *name;
     char *author;
 } Book;
 
 typedef struct _Reader {
+    int id;
     char *first_name;
     char *last_name;
     int age;
-    Book books_taken[MAX_READER_BOOKS_TAKEN_SIZE];
     char *_str_books_taken;
+    int count_books_taken;
 } Reader;
 
 typedef struct _Library {

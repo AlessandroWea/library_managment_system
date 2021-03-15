@@ -26,5 +26,6 @@ void remove_reader();
 void show_all_readers();
 
 void init_library(Library *library);
+void free_library(Library *library);
 
 #endif

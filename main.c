@@ -1,36 +1,5 @@
-/*
-LIBRARY MANAGMENT SYSTEM
-    appearence:
----------------
-Welcome!
-books - to manage books
-readers - to manage readers
-main> smth
-Managment section
-add - to add
-remove - to remove
-back - to go back
-books/readers> add
-...does smth
-books/readers>
--------------------
-Problems:
-1) Entering a lot of input makes more than 1 message happen
-(books> [s*100] => N messages)
-
-Functionality:
-1) Books' functions
-    - adding books
-    - removing books
-    - showing books
-2) Readers' functions
-    - include a reader
-    - exclude a reader
-    - show all the readers
-    - select a reader to show his information
-
-*/
 #include "main.h"
+#include "menus.h"
 #include "db_interactions.h"
 
 int main()
@@ -39,9 +8,9 @@ int main()
     Library library;
     library.books_count = 0;
     library.readers_count = 0;
-    // init_library(&library);
+    init_library(&library);
     
-    make_tables();
+    // make_tables();
     
     show_main_menu();
 
@@ -62,6 +31,7 @@ int main()
                 break;
             case MENU_QUIT:
                 running = FALSE;
+                free_library(&library);
                 printf("Bye!\n");
                 break;
             case MENU_UNDEFINED:
@@ -72,7 +42,6 @@ int main()
                 break;
         }
     }
-
     return 0;
 }
 
@@ -80,6 +49,22 @@ void init_library(Library *library)
 {
     get_books(library);
     get_readers(library);
+}
+
+void free_library(Library *library)
+{
+    for(int i = 0 ; i < library->books_count; i++)
+    {
+        free(library->books[i].name);
+        free(library->books[i].author);
+    }
+
+    for(int i = 0; i < library->readers; i++)
+    {
+        free(library->readers[i].first_name);
+        free(library->readers[i].last_name);
+        free(library->readers[i]._str_books_taken);
+    }
 }
 
 void books_managment()
@@ -162,7 +147,6 @@ void readers_managment()
 
 }
 
-
 int get_choice()
 {
     char choice_input[MAX_COMMAND_SIZE];
@@ -173,10 +157,12 @@ int get_choice()
     if(!strcmp(choice_input,"books"))
     {
         ret_val = MENU_BOOKS;
-    } else if(!strcmp(choice_input,"readers"))
+    }
+    else if(!strcmp(choice_input,"readers"))
     {
         ret_val = MENU_READERS;
-    } else if(!strcmp(choice_input,"quit"))
+    }
+    else if(!strcmp(choice_input,"quit"))
     {
         ret_val = MENU_QUIT;
     }
